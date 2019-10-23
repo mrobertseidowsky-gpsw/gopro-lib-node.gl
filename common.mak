@@ -25,6 +25,7 @@
 SHARED     ?= no
 DEBUG      ?= no
 SMALL      ?= no
+COVERAGE   ?= no
 CURL       ?= curl
 INSTALL    ?= install
 PKG_CONFIG ?= pkg-config
@@ -51,14 +52,19 @@ PROJECT_CFLAGS := $(CFLAGS) -Wall -O2 -Werror=missing-prototypes \
                   -std=c99 \
                   -DTARGET_$(call capitalize,$(TARGET_OS)) \
                   -DARCH_$(call capitalize,$(ARCH))
+PROJECT_LDLIBS := $(LDLIBS)
 
+ifeq ($(COVERAGE),yes)
+	PROJECT_CFLAGS += --coverage
+	PROJECT_LDLIBS += --coverage
+	DEBUG = yes
+endif
 ifeq ($(DEBUG),yes)
 	PROJECT_CFLAGS += -g
 endif
 ifeq ($(SMALL),yes)
 	PROJECT_CFLAGS += -DCONFIG_SMALL
 endif
-PROJECT_LDLIBS := $(LDLIBS)
 
 ifeq ($(TARGET_OS),MinGW-w64)
 	EXESUF = .exe
