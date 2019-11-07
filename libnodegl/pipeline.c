@@ -285,6 +285,8 @@ static int build_buffer_pairs(struct pipeline *s, const struct pipeline_params *
     return 0;
 }
 
+
+
 static void set_vertex_attribs(const struct pipeline *s, struct glcontext *gl)
 {
     const struct attribute_pair *pairs = ngli_darray_data(&s->attribute_pairs);
@@ -298,6 +300,7 @@ static void set_vertex_attribs(const struct pipeline *s, struct glcontext *gl)
         const GLint stride = attribute->stride * count;
 
         for (int i = 0; i < count; i++) {
+            LOG(ERROR, "name=%s", attribute->name);
             ngli_glEnableVertexAttribArray(gl, location + i);
             ngli_glBindBuffer(gl, GL_ARRAY_BUFFER, buffer->id);
             ngli_glVertexAttribPointer(gl, location, size, GL_FLOAT, GL_FALSE, stride, (void*)(uintptr_t)(stride * i + attribute->offset));
@@ -334,7 +337,7 @@ static int build_attribute_pairs(struct pipeline *s, const struct pipeline_param
     for (int i = 0; i < params->nb_attributes; i++) {
         const struct pipeline_attribute *attribute = &params->attributes[i];
         const struct program_variable_info *info = ngli_hmap_get(program->attributes, attribute->name);
-        if (!info)
+        if (!info || info->location < 0)
             continue;
 
         if (attribute->count > 4) {

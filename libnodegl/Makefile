@@ -121,6 +121,7 @@ LIB_OBJS = animation.o              \
            pass.o                   \
            pipeline.o               \
            program.o                \
+           program_reflection.o     \
            rendertarget.o           \
            serialize.o              \
            texture.o                \
@@ -146,7 +147,7 @@ LIB_EXTRA_CFLAGS_Android   = -DHAVE_GLPLATFORM_EGL
 LIB_EXTRA_CFLAGS_iPhone    = -DHAVE_GLPLATFORM_EAGL
 LIB_EXTRA_CFLAGS_MinGW-w64 = -DHAVE_GLPLATFORM_WGL
 
-LIB_LDLIBS                 = -lm -lpthread
+LIB_LDLIBS                 = -lm -lpthread -L/home/mateo/src/devel/.sx/stupeflix/lib -lglslang -lstdc++
 LIB_EXTRA_LDLIBS_Linux     =
 LIB_EXTRA_LDLIBS_Darwin    = -framework OpenGL -framework CoreVideo -framework CoreFoundation -framework AppKit -framework IOSurface
 LIB_EXTRA_LDLIBS_Android   = -legl -landroid
