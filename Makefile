@@ -93,11 +93,14 @@ sxplayer-$(SXPLAYER_VERSION).tar.gz:
 $(PREFIX):
 	$(VIRTUALENV) $(PREFIX)
 
-tests: ngl-tools-install pynodegl-utils-install tests_libnodegl
+tests: ngl-tools-install pynodegl-utils-install tests_libnodegl tests-deps-install
 	(source $(ACTIVATE) && $(MAKE) -C tests)
 
 tests_libnodegl: nodegl-install
 	(source $(ACTIVATE) && PKG_CONFIG_PATH=$(PREFIX)/lib/pkgconfig LDFLAGS=$(RPATH_LDFLAGS) $(MAKE) -C libnodegl tests DEBUG=$(DEBUG))
+
+tests-deps-install: $(PREFIX)
+	(source $(PREFIX)/bin/activate && pip install pillow)
 
 clean_py:
 	$(RM) pynodegl/nodes_def.pyx
@@ -123,6 +126,6 @@ coverage: tests
 .PHONY: pynodegl-install pynodegl-deps-install
 .PHONY: nodegl-install
 .PHONY: sxplayer-install
-.PHONY: tests tests_libnodegl
+.PHONY: tests tests_libnodegl tests-deps-install
 .PHONY: clean clean_py
 .PHONY: coverage

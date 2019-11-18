@@ -1,5 +1,5 @@
 #
-# Copyright 2017 GoPro Inc.
+# Copyright 2019 GoPro Inc.
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -19,15 +19,28 @@
 # under the License.
 #
 
-include ../common.mak
+test-blending-none: FUNC_NAME = test_blending_none
+BLENDING_TESTS += test-blending-none
 
+test-blending-multiply: FUNC_NAME = test_blending_multiply
+BLENDING_TESTS += test-blending-multiply
 
-all: tests
+test-blending-screen: FUNC_NAME = test_blending_screen
+BLENDING_TESTS += test-blending-screen
 
-include api.mak
-include blending.mak
-include visual.mak
+test-blending-darken: FUNC_NAME = test_blending_darken
+BLENDING_TESTS += test-blending-darken
 
-tests: $(TESTS)
+test-blending-lighten: FUNC_NAME = test_blending_lighten
+BLENDING_TESTS += test-blending-lighten
 
-.PHONY: all tests $(TESTS)
+RENDER_WIDTH = 1280
+RENDER_HEIGHT = 800
+TOLERANCE = 1
+$(BLENDING_TESTS):
+	@echo $@
+	@$(PYTHON) -c 'from blending import $(FUNC_NAME); $(FUNC_NAME)()' > /dev/null
+
+test-blending: $(BLENDING_TESTS)
+
+TESTS += $(BLENDING_TESTS)
