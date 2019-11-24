@@ -25,9 +25,11 @@
 SHARED     ?= no
 DEBUG      ?= no
 SMALL      ?= no
+CURL       ?= curl
 INSTALL    ?= install
 PKG_CONFIG ?= pkg-config
 PYTHON     ?= python
+TAR        ?= tar
 TARGET_OS  ?= $(shell uname -s)
 ARCH       ?= $(shell uname -m)
 
