@@ -358,6 +358,10 @@ struct ngl_config {
     uint8_t *capture_buffer; /* RGBA offscreen capture buffer. If allocated,
                                 its size must be at least width * height * 4
                                 bytes. */
+
+    const char *stats_filename; /* Path to statistics export file (CSV), can be NULL */
+
+    int enable_hud; /* Display a HUD (enabling this has performance implications) */
 };
 
 /**

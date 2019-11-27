@@ -81,7 +81,7 @@ struct ngl_ctx {
     int program_id;
     struct ngl_node *scene;
     struct ngl_config config;
-    int timer_active;
+    int stats_enabled;
     struct darray modelview_matrix_stack;
     struct darray projection_matrix_stack;
     struct darray activitycheck_nodes;

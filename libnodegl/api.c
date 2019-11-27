@@ -117,6 +117,9 @@ static int cmd_prepare_draw(struct ngl_ctx *s, void *arg)
 
     LOG(DEBUG, "prepare scene %s @ t=%f", scene->label, t);
 
+    if (s->stats_enabled)
+        ngli_glcontext_start_stats(s);
+
     s->activitycheck_nodes.count = 0;
     int ret = ngli_node_visit(scene, 1, t);
     if (ret < 0)
@@ -130,12 +133,18 @@ static int cmd_prepare_draw(struct ngl_ctx *s, void *arg)
     if (ret < 0)
         return ret;
 
+    if (s->stats_enabled)
+        ngli_glcontext_end_stats(s);
+
     return 0;
 }
 
 static int cmd_draw(struct ngl_ctx *s, void *arg)
 {
     const double t = *(double *)arg;
+
+    if (s->stats_enabled)
+        ngli_glcontext_start_stats(s);
 
     int ret = s->backend->pre_draw(s, t);
     if (ret < 0)
@@ -148,6 +157,20 @@ static int cmd_draw(struct ngl_ctx *s, void *arg)
     if (s->scene) {
         LOG(DEBUG, "draw scene %s @ t=%f", s->scene->label, t);
         ngli_node_draw(s->scene);
+    }
+
+    if (s->stats_enabled) {
+        ngli_glcontext_end_stats(s);
+        if (s->config.enable_hud) {
+            ret = ngli_hud_draw(s);
+            if (ret < 0)
+                goto end;
+        }
+        if (s->config.stats_filename) {
+            ret = ngli_stats_save(s);
+            if (ret < 0)
+                goto end;
+        }
     }
 
 end:;

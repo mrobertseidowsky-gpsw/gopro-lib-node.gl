@@ -402,6 +402,9 @@ static int gl_configure(struct ngl_ctx *s, const struct ngl_config *config)
 
 static int gl_pre_draw(struct ngl_ctx *s, double t)
 {
+    if (s->config.enable_hud)
+        priv->glBeginQuery(gl, GL_TIME_ELAPSED, priv->query);
+
     ngli_gctx_clear_color(s);
     ngli_gctx_clear_depth_stencil(s);
 
@@ -426,6 +429,14 @@ static int gl_post_draw(struct ngl_ctx *s, double t)
         ngli_glcontext_set_surface_pts(gl, t);
 
     ngli_glcontext_swap_buffers(gl);
+
+    if (s->config.enable_hud) {
+        GLuint64 gpu_tdraw = 0;
+        priv->glEndQuery(gl, GL_TIME_ELAPSED);
+        priv->glGetQueryObjectui64v(gl, priv->query, GL_QUERY_RESULT, &gpu_tdraw);
+
+        s->gpu_tdraw = gpu_tdraw;
+    }
 
     return ret;
 }
