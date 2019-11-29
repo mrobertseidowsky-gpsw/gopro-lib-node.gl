@@ -144,7 +144,7 @@ class Player(QtCore.QThread):
 
     def run(self):
         while True:
-            self._render()
+            #self._render()
             should_stop = self._handle_events()
             if should_stop:
                 break
@@ -171,7 +171,8 @@ class Player(QtCore.QThread):
         self._mutex.unlock()
 
     def draw(self):
-        self._push_event(lambda: False)
+        self._render()
+        #self._push_event(lambda: self._render())
 
     def play(self):
         self._push_event(lambda: self._play())
@@ -217,7 +218,9 @@ class Player(QtCore.QThread):
         return False
 
     def resize(self, width, height):
-        self._push_event(lambda: self._resize(width, height))
+        self._width = width
+        self._height = height
+        self._configure_viewer()
 
     def _resize(self, width, height):
         self._width = width
@@ -226,7 +229,8 @@ class Player(QtCore.QThread):
         return False
 
     def set_scene(self, cfg):
-        self._push_event(lambda: self._set_scene(cfg))
+        self._set_scene(cfg)
+        #self._push_event(lambda: self._set_scene(cfg))
 
     def _set_scene(self, cfg):
         if cfg is None:

@@ -43,12 +43,34 @@ class _GLWidget(QtWidgets.QWidget):
         self.setAttribute(Qt.WA_PaintOnScreen)
         self.setMinimumSize(640, 360)
 
+        self._update_pending = False
         self._player = None
         self._last_frame_time = 0.0
         self._config = config
 
     def paintEngine(self):
         return None
+
+    def paintEvent(self, event):
+        if not self._player:
+            self._player = player.Player(
+                self.winId(),
+                self.width() * self.devicePixelRatioF(),
+                self.height() * self.devicePixelRatioF(),
+                self._config,
+            )
+            self._player.start()
+            self._player.onFrame.connect(self._set_last_frame_time)
+            self.onPlayerAvailable.emit()
+            return
+
+        if not self._update_pending:
+            print 'post'
+            self._update_pending = True
+            QtWidgets.QApplication.postEvent(self, QEvent(QEvent.UpdateRequest))
+        print 'draw'
+        self._player.draw()
+
 
     def resizeEvent(self, event):
         if not self._player:
@@ -62,19 +84,11 @@ class _GLWidget(QtWidgets.QWidget):
         super(_GLWidget, self).resizeEvent(event)
 
     def event(self, event):
-        if event.type() == QEvent.Paint:
-            if not self._player:
-                self._player = player.Player(
-                    self.winId(),
-                    self.width() * self.devicePixelRatioF(),
-                    self.height() * self.devicePixelRatioF(),
-                    self._config,
-                )
-                self._player.start()
-                self._player.onFrame.connect(self._set_last_frame_time)
-                self.onPlayerAvailable.emit()
-            else:
-                self._player.draw()
+        if event.type() == QEvent.UpdateRequest:
+            self._update_pending = False
+            self.paintEvent(None)
+            #self._player.draw()
+            return True
         elif event.type() == QEvent.Close:
             if self._player:
                 self._player.stop()
